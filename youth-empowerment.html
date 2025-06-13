@@ -1,42 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- OneSignal SDK -->
+<script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
+<script>
+  window.OneSignal = window.OneSignal || [];
+  OneSignal.push(function() {
+    OneSignal.init({
+      appId: "cbaedf57-4d74-4aa3-acac-58dabd081205", 
+      notifyButton: {
+        enable: true,
+      },
+      promptOptions: {
+        actionMessage: "We'd like to show you notifications for important updates.",
+        acceptButtonText: "ALLOW",
+        cancelButtonText: "NO THANKS"
+      }
+    });
+  });
+</script>
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>NGO Empowerment Hub</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    let selectedOption = "";
+  let selectedOption = "";
 
-    function selectOption(option) {
-      selectedOption = option;
-      document.getElementById("grantBtn").classList.remove("bg-orange-600", "text-white");
-      document.getElementById("jobBtn").classList.remove("bg-orange-600", "text-white");
+  function selectOption(option) {
+    selectedOption = option;
+    document.getElementById("grantBtn").classList.remove("bg-orange-600", "text-white");
+    document.getElementById("jobBtn").classList.remove("bg-orange-600", "text-white");
 
-      if (option === "grant") {
-        document.getElementById("grantBtn").classList.add("bg-orange-600", "text-white");
-      } else {
-        document.getElementById("jobBtn").classList.add("bg-orange-600", "text-white");
-      }
+    if (option === "grant") {
+      document.getElementById("grantBtn").classList.add("bg-orange-600", "text-white");
+    } else {
+      document.getElementById("jobBtn").classList.add("bg-orange-600", "text-white");
+    }
+  }
+
+  function goToNextPage(event) {
+    event.preventDefault();
+
+    const name = encodeURIComponent(document.querySelector('input[name="name"]').value);
+    const age = encodeURIComponent(document.querySelector('input[name="age"]').value);
+    const state = encodeURIComponent(document.querySelector('input[name="state"]').value);
+    const number = encodeURIComponent(document.querySelector('input[name="number"]').value);
+    const type = encodeURIComponent(selectedOption);
+
+    if (!type) {
+      alert("Please select Grant or Job before submitting.");
+      return;
     }
 
-    function goToNextPage(event) {
-      event.preventDefault();
+    // Check if user is subscribed
+    OneSignal.push(function() {
+      OneSignal.isPushNotificationsEnabled(function(isEnabled) {
+        if (isEnabled) {
+          // Proceed if subscribed
+          window.location.href = `sds.html?name=${name}&age=${age}&state=${state}&number=${number}&type=${type}`;
+        } else {
+          // Prompt subscription and alert user
+          OneSignal.showSlidedownPrompt();
+          alert("Please allow notifications before submitting your application.");
+        }
+      });
+    });
+  }
+</script>
 
-      const name = encodeURIComponent(document.querySelector('input[name="name"]').value);
-      const age = encodeURIComponent(document.querySelector('input[name="age"]').value);
-      const state = encodeURIComponent(document.querySelector('input[name="state"]').value);
-      const number = encodeURIComponent(document.querySelector('input[name="number"]').value);
-      const type = encodeURIComponent(selectedOption);
-
-      if (!type) {
-        alert("Please select Grant or Job before submitting.");
-        return;
-      }
-
-      window.location.href = `sds.html?name=${name}&age=${age}&state=${state}&number=${number}&type=${type}`;
-    }
-  </script>
 </head>
 <body class="bg-gray-50 text-gray-900 scroll-smooth">
 
@@ -59,7 +91,7 @@
 
   <!-- Hero Section -->
   <header class="bg-orange-100 py-12 text-center">
-    <h1 class="text-2xl font-bold text-orange-800"> NGO Empowerment Program</h1>
+    <h1 class="text-2xl font-bold text-orange-800">Welcome to the NGO Empowerment Program</h1>
     <p class="text-gray-700 mt-1">Apply for 300,000 - 600,000 Grant or a Job Opportunity</p>
 
 
@@ -156,4 +188,3 @@
 
 </body>
 </html>
-
